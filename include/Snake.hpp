@@ -53,6 +53,7 @@ class Snake {
     auto change_dir(Direction dir) -> void;
     auto grow() -> void;
     auto step() -> void;
+    auto get_body() -> std::vector<coord>;
 
     auto get_pos() -> coord;
 };

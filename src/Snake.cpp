@@ -1,4 +1,4 @@
-#include "Snake.hpp"
+#include "../include/Snake.hpp"
 
 Snake::Snake(WINDOW *win, Direction dir, coord pos):
   m_win(win),
@@ -64,4 +64,8 @@ auto Snake::check_body_coll(coord pos) -> bool {
     if (c.x == pos.x && c.y == pos.y)
       return true;
   return false;
+}
+
+auto Snake::get_body() -> std::vector<coord> {
+  return std::move(std::vector<coord>(m_body_pos.begin(), m_body_pos.end() - 1));
 }

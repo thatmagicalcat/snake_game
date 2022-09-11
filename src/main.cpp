@@ -2,8 +2,8 @@
 #include <ncurses.h>
 #include <thread>
 
-#include "Snake.hpp"
-#include "Food.hpp"
+#include "../include/Snake.hpp"
+#include "../include/Food.hpp"
 
 using coord = Food::coord;
 
@@ -48,15 +48,13 @@ auto game() -> void {
     (width / 2) - 50  // Win x position
   ); 
 
-  coord start, end;
-  getyx(win, start.y, start.x);
+  coord end;
   getmaxyx(win, end.y, end.x);
 
   Snake snake(win, Snake::Direction::Right, {5, 5});
-  Food food(
-    { .x = (width / 2) - 49, .y = (height / 2) - 14 },
-    { 1, 1 }
-  );
+  Food food({
+    .x = end.x - 2, .y = end.y - 2
+  }, { 1, 1 });
 
   snake.draw();
 
@@ -72,7 +70,8 @@ auto game() -> void {
 
   halfdelay(5); // only wait 500ms for user input
 
-  coord food_pos = food.get_food();
+  coord food_pos = food.get_food(), pre_pos;
+  pre_pos = food_pos;
 
   mvwprintw(score_win, 1, 1, "Score: %i", 0);
   mvwaddch(win, food_pos.y, food_pos.x, '*' | A_BOLD | COLOR_PAIR(5));
@@ -83,9 +82,10 @@ auto game() -> void {
   char ch;
 
   bool pause;
-  int game_score = 1;
+  int game_score = 0;
 
   while (1) {
+    // mvwprintw(score_win, 3, 1, "X:%i,Y:%i", food_pos.x, food_pos.y);
     if (pause)
       mvwprintw(score_win, 2, 1, "Paused");
     wrefresh(score_win);
@@ -123,13 +123,26 @@ auto game() -> void {
 
     try { snake.step(); } catch (const GameOver &e) { break; }
 
+    mvwaddch(win, food_pos.y, food_pos.x, '*' | A_BOLD | COLOR_PAIR(5));
     if (coll(snake.get_pos(), food_pos)) {
       snake.grow();
 
-      food_pos = food.get_food();
+      bool has_collided = true;
+      while (1) {
+        pre_pos = food.get_food(); 
+
+        if (pre_pos.x != food_pos.x && pre_pos.y != food_pos.y)
+          for (const Snake::coord &p : snake.get_body())
+            if (p.x == pre_pos.x && p.y == pre_pos.y) {
+              has_collided = false;
+              break;
+            }
+        if (has_collided) break;
+      } food_pos = pre_pos;
+
       mvwaddch(win, food_pos.y, food_pos.x, '*' | A_BOLD | COLOR_PAIR(5));
 
-      mvwprintw(score_win, 1, 1, "Score: %i", game_score++);
+      mvwprintw(score_win, 1, 1, "Score: %i", ++game_score);
       wrefresh(score_win);
     } else if (coll_wall(snake.get_pos())) break;
 

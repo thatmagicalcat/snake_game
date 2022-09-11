@@ -1,6 +1,6 @@
 COMPILER = clang++
 
-FLAGS = -lncurses -std=c++17 -I include 
+FLAGS = -lncurses -std=c++17 -Iinclude 
 
 SRC = src
 SRCS = $(wildcard $(SRC)/*.cpp)

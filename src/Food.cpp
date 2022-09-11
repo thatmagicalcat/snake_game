@@ -1,4 +1,4 @@
-#include "Food.hpp"
+#include "../include/Food.hpp"
 
 Food::Food(coord end_pos, coord start_pos) {
   srand(time(NULL));
@@ -9,12 +9,12 @@ Food::Food(coord end_pos, coord start_pos) {
 
 auto Food::get_food() -> coord {
   return {
-    get_rand(
+    .x = get_rand(
       start_end_coord[1].x,
       start_end_coord[0].x
     ),
 
-    get_rand(
+    .y = get_rand(
       start_end_coord[1].y,
       start_end_coord[0].y
     )
